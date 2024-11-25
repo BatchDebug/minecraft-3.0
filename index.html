@@ -1,0 +1,863 @@
+<html><head><base href="." />
+<title>Minecraft 3.0: The</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+    background: #333;
+    font-family: 'Minecraft', monospace;
+    overflow: hidden;
+}
+
+.minecraft-btn {
+    border: 3px solid #000;
+    background: #727272;
+    padding: 15px 30px;
+    font-size: 20px;
+    color: white;
+    text-shadow: 2px 2px #000;
+    margin: 10px;
+    cursor: pointer;
+    width: 300px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.minecraft-btn:hover {
+    background: #8b8b8b;
+    transform: scale(1.05);
+}
+
+.menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.game-container {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+}
+
+.logo {
+    font-size: 50px;
+    color: #fff;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 30px;
+    animation: float 3s infinite ease-in-out;
+}
+
+.inventory {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border: 2px solid #fff;
+    display: none;
+}
+
+.inventory-slot {
+    width: 50px;
+    height: 50px;
+    border: 2px solid #fff;
+    display: inline-block;
+    margin: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    background-size: cover;
+    image-rendering: pixelated;
+}
+
+.inventory-slot[data-type="wood"] {
+    background-image: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_log.png');
+}
+
+.inventory-slot[data-type="leaves"] {
+    background-image: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_leaves.png');
+}
+
+.inventory-slot[data-type="stone"] {
+    background-image: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/stone.png');
+}
+
+.selected {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    pointer-events: none;
+    display: none;
+}
+
+.health-bar {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 200px;
+    height: 20px;
+    background: #333;
+    border: 2px solid #fff;
+}
+
+.health {
+    width: 100%;
+    height: 100%;
+    background: #ff0000;
+    transition: width 0.3s;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+.controls-list {
+    color: white;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border: 2px solid #fff;
+    margin: 20px auto;
+    width: 300px;
+    font-size: 16px;
+}
+
+.controls-list h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+}
+
+.controls-list ul {
+    list-style-type: none;
+}
+
+.controls-list li {
+    margin: 10px 0;
+    text-shadow: 1px 1px #000;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+.credits-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.credits {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    animation: scrollCredits 60s linear; /* Increased from 30s to 60s */
+    font-family: 'Minecraft', monospace;
+    font-size: 24px;
+}
+
+@keyframes scrollCredits {
+    0% {
+        transform: translateY(100vh);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
+.credits h2 {
+    color: #ff69b4;
+    font-size: 36px;
+    margin: 30px 0;
+    text-shadow: 2px 2px #000;
+}
+
+.credits p {
+    margin: 15px 0;
+    color: #ffd700;
+    text-shadow: 2px 2px #000;
+}
+
+.credits .role {
+    color: #87ceeb;
+    font-size: 20px;
+    margin-top: 20px;
+}
+</style>
+
+<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F21%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
+<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F20%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
+<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F19%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
+<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F17%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
+<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const blockTextures = {
+    wood: 'https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_log.png',
+    leaves: 'https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_leaves.png',
+    stone: 'https://raw.githubusercontent.com/minecraft/textures/main/blocks/stone.png'
+};
+
+let scene, camera, renderer, world;
+let sun;
+let time = 0;
+let isGameStarted = false;
+let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+let canJump = true;
+let velocity = new THREE.Vector3();
+let jumpVelocity = 0;
+const JUMP_FORCE = 1.0;
+const GRAVITY = 0.005;
+let direction = new THREE.Vector3();
+let blocks = [];
+let selectedBlock = 0;
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let playerHealth = 100;
+let inventory = {
+    'wood': 0,
+    'leaves': 0,
+    'stone': 0
+};
+
+function initGame() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ 
+        canvas: document.getElementById('gameCanvas'),
+        antialias: true 
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x87CEEB);
+    renderer.physicallyCorrectLights = true;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    const hemisphereLight = new THREE.HemisphereLight(0xffd700, 0xff69b4, 1);
+    scene.add(hemisphereLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xfff4e5, 1.5);
+    directionalLight.position.set(10, 20, 10);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    createSun();
+    
+    const groundGeometry = new THREE.PlaneGeometry(100, 100);
+    const groundMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x55aa55,
+        specular: 0x222222,
+        shininess: 10
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+    
+    for(let i = 0; i < 20; i++) {
+        const x = Math.random() * 80 - 40;
+        const z = Math.random() * 80 - 40;
+        createTree(x, 0, z);
+    }
+    
+    for(let i = 0; i < 15; i++) {
+        const x = Math.random() * 80 - 40;
+        const z = Math.random() * 80 - 40;
+        createStoneDeposit(x, 0, z);
+    }
+
+    for(let i = 0; i < 3; i++) {
+        const x = Math.random() * 80 - 40;
+        const z = Math.random() * 80 - 40;
+        createPyramid(x, 0, z);
+    }
+
+    for(let i = 0; i < 5; i++) {
+        const x = Math.random() * 80 - 40;
+        const z = Math.random() * 80 - 40;
+        createWell(x, 0, z);
+    }
+    
+    for(let i = 0; i < 3; i++) {
+        const x = Math.random() * 20 - 10;
+        const z = Math.random() * 20 - 10;
+        createZombie(x, 0, z);
+    }
+    
+    camera.position.set(5, 2, 5);
+    camera.lookAt(0, 0, 0);
+    
+    setupControls();
+    setupInventory();
+    setupHealthBar();
+    
+    document.querySelector('.crosshair').style.display = 'block';
+    
+    animate();
+}
+
+function createPyramid(x, y, z) {
+    const levels = 5;
+    const blockSize = 1;
+    const sandMaterial = new THREE.MeshPhongMaterial({
+        color: 0xD2B48C,
+        specular: 0x444444,
+        shininess: 20,
+        emissive: 0x3d2817,
+        emissiveIntensity: 0.1
+    });
+
+    for(let level = 0; level < levels; level++) {
+        const size = (levels - level) * 2 - 1;
+        for(let i = 0; i < size; i++) {
+            for(let j = 0; j < size; j++) {
+                const blockGeometry = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+                const block = new THREE.Mesh(blockGeometry, sandMaterial);
+                block.position.set(
+                    x + (i - size/2) * blockSize,
+                    y + level * blockSize,
+                    z + (j - size/2) * blockSize
+                );
+                block.userData.type = 'stone';
+                scene.add(block);
+                blocks.push(block);
+            }
+        }
+    }
+}
+
+function createWell(x, y, z) {
+    const wellMaterial = new THREE.MeshPhongMaterial({
+        color: 0x808080,
+        specular: 0x444444,
+        shininess: 30,
+        emissive: 0x222222,
+        emissiveIntensity: 0.2
+    });
+
+    // Create the base
+    for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 3; j++) {
+            const blockGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const block = new THREE.Mesh(blockGeometry, wellMaterial);
+            block.position.set(x + i, y, z + j);
+            block.userData.type = 'stone';
+            scene.add(block);
+            blocks.push(block);
+        }
+    }
+
+    // Create the walls
+    for(let h = 0; h < 2; h++) {
+        for(let i = 0; i < 3; i++) {
+            for(let j = 0; j < 3; j++) {
+                if(i === 0 || i === 2 || j === 0 || j === 2) {
+                    const blockGeometry = new THREE.BoxGeometry(1, 1, 1);
+                    const block = new THREE.Mesh(blockGeometry, wellMaterial);
+                    block.position.set(x + i, y + h + 1, z + j);
+                    block.userData.type = 'stone';
+                    scene.add(block);
+                    blocks.push(block);
+                }
+            }
+        }
+    }
+}
+
+function createSun() {
+    const sunGeometry = new THREE.SphereGeometry(5, 32, 32);
+    const sunMaterial = new THREE.MeshPhongMaterial({
+        emissive: 0xff00ff,
+        emissiveIntensity: 1,
+        color: 0xff1493,
+        shininess: 100,
+    });
+    sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    sun.position.set(50, 40, -50);
+    scene.add(sun);
+
+    const sunLight = new THREE.PointLight(0xffff00, 2, 100);
+    sun.add(sunLight);
+}
+
+function createTree(x, y, z) {
+    const trunkGeometry = new THREE.BoxGeometry(0.5, 2, 0.5);
+    const trunkMaterial = new THREE.MeshPhongMaterial({
+        color: 0xa0522d,
+        map: new THREE.TextureLoader().load(blockTextures.wood),
+        specular: 0x444444,
+        shininess: 30,
+        emissive: 0x3d2817,
+        emissiveIntensity: 0.2
+    });
+    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.position.set(x, y + 1, z);
+    trunk.userData.type = 'wood';
+    scene.add(trunk);
+    blocks.push(trunk);
+    
+    const leavesGeometry = new THREE.BoxGeometry(2, 2, 2);
+    const leavesMaterial = new THREE.MeshPhongMaterial({
+        color: 0x228B22,
+        map: new THREE.TextureLoader().load(blockTextures.leaves),
+        specular: 0x444444,
+        shininess: 30,
+        emissive: 0x114411,
+        emissiveIntensity: 0.2
+    });
+    const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+    leaves.position.set(x, y + 2.5, z);
+    leaves.userData.type = 'leaves';
+    scene.add(leaves);
+    blocks.push(leaves);
+}
+
+function createStoneDeposit(x, y, z) {
+    const stoneGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const stoneMaterial = new THREE.MeshPhongMaterial({
+        color: 0x808080,
+        map: new THREE.TextureLoader().load(blockTextures.stone),
+        specular: 0x444444,
+        shininess: 40,
+        emissive: 0x222222,
+        emissiveIntensity: 0.2
+    });
+    const stone = new THREE.Mesh(stoneGeometry, stoneMaterial);
+    stone.position.set(x, y + 0.5, z);
+    stone.userData.type = 'stone';
+    scene.add(stone);
+    blocks.push(stone);
+}
+
+function createZombie(x, y, z) {
+    const bodyGeometry = new THREE.BoxGeometry(0.6, 1.8, 0.3);
+    const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const zombie = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    zombie.position.set(x, y + 0.9, z);
+    scene.add(zombie);
+    
+    setInterval(() => {
+        const directionToPlayer = new THREE.Vector3();
+        directionToPlayer.subVectors(camera.position, zombie.position);
+        directionToPlayer.normalize();
+        
+        zombie.position.x += directionToPlayer.x * 0.05;
+        zombie.position.z += directionToPlayer.z * 0.05;
+        
+        if(zombie.position.distanceTo(camera.position) < 2) {
+            damagePlayer(10);
+        }
+    }, 100);
+}
+
+function damagePlayer(amount) {
+    playerHealth -= amount;
+    updateHealthBar();
+    if(playerHealth <= 0) {
+        alert('Game Over!');
+        location.reload();
+    }
+}
+
+function setupHealthBar() {
+    const healthBar = document.createElement('div');
+    healthBar.className = 'health-bar';
+    const health = document.createElement('div');
+    health.className = 'health';
+    healthBar.appendChild(health);
+    document.body.appendChild(healthBar);
+}
+
+function updateHealthBar() {
+    document.querySelector('.health').style.width = `${playerHealth}%`;
+}
+
+function updateInventoryDisplay() {
+    const slots = document.querySelectorAll('.inventory-slot');
+    Object.entries(inventory).forEach(([type, count], index) => {
+        const countDisplay = slots[index].querySelector('.count');
+        if(countDisplay) {
+            countDisplay.textContent = count;
+        } else {
+            const countElement = document.createElement('div');
+            countElement.className = 'count';
+            countElement.textContent = count;
+            slots[index].appendChild(countElement);
+        }
+    });
+}
+
+function placeOrBreakBlock(event) {
+    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+    const intersects = raycaster.intersectObjects(blocks);
+    
+    if(intersects.length > 0) {
+        const intersection = intersects[0];
+        if(event.button === 0) { // Left click - break block
+            const blockType = intersection.object.userData.type;
+            inventory[blockType] = (inventory[blockType] || 0) + 1;
+            scene.remove(intersection.object);
+            blocks = blocks.filter(block => block !== intersection.object);
+            updateInventoryDisplay();
+        } else if(event.button === 2) { // Right click - place block
+            const selectedType = Object.keys(inventory)[selectedBlock];
+            if(inventory[selectedType] > 0) {
+                const position = intersection.point.add(intersection.face.normal);
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                let material;
+                
+                switch(selectedType) {
+                    case 'wood':
+                        material = new THREE.MeshPhongMaterial({
+                            color: 0xa0522d,
+                            map: new THREE.TextureLoader().load(blockTextures.wood),
+                            specular: 0x444444,
+                            shininess: 30,
+                            emissive: 0x3d2817,
+                            emissiveIntensity: 0.2
+                        });
+                        break;
+                    case 'leaves':
+                        material = new THREE.MeshPhongMaterial({
+                            color: 0x228B22,
+                            map: new THREE.TextureLoader().load(blockTextures.leaves),
+                            specular: 0x444444,
+                            shininess: 30,
+                            emissive: 0x114411,
+                            emissiveIntensity: 0.2
+                        });
+                        break;
+                    case 'stone':
+                        material = new THREE.MeshPhongMaterial({
+                            color: 0x808080,
+                            map: new THREE.TextureLoader().load(blockTextures.stone),
+                            specular: 0x444444,
+                            shininess: 40,
+                            emissive: 0x222222,
+                            emissiveIntensity: 0.2
+                        });
+                        break;
+                }
+                
+                const block = new THREE.Mesh(geometry, material);
+                block.position.copy(position);
+                block.userData.type = selectedType;
+                scene.add(block);
+                blocks.push(block);
+                inventory[selectedType]--;
+                updateInventoryDisplay();
+            }
+        }
+    }
+}
+
+function setupControls() {
+    document.addEventListener('keydown', (event) => {
+        switch(event.code) {
+            case 'KeyW': moveForward = true; break;
+            case 'KeyS': moveBackward = true; break;
+            case 'KeyA': moveLeft = true; break;
+            case 'KeyD': moveRight = true; break;
+            case 'Space': 
+                if(canJump) {
+                    jumpVelocity = JUMP_FORCE;
+                    canJump = false;
+                }
+                break;
+            case 'Digit1': selectedBlock = 0; updateInventorySelection(); break;
+            case 'Digit2': selectedBlock = 1; updateInventorySelection(); break;
+            case 'Digit3': selectedBlock = 2; updateInventorySelection(); break;
+        }
+    });
+    
+    document.addEventListener('keyup', (event) => {
+        switch(event.code) {
+            case 'KeyW': moveForward = false; break;
+            case 'KeyS': moveBackward = false; break;
+            case 'KeyA': moveLeft = false; break;
+            case 'KeyD': moveRight = false; break;
+        }
+    });
+    
+    document.addEventListener('mousemove', (event) => {
+        if (document.pointerLockElement === document.body) {
+            camera.rotation.y -= event.movementX * 0.002;
+            camera.rotation.x -= event.movementY * 0.002;
+            camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
+        }
+    });
+    
+    document.addEventListener('mousedown', (event) => {
+        if (!document.pointerLockElement) {
+            document.body.requestPointerLock();
+        } else {
+            placeOrBreakBlock(event);
+        }
+    });
+
+    document.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+    });
+}
+
+function setupInventory() {
+    const inventory = document.createElement('div');
+    inventory.className = 'inventory';
+    
+    const blockTypes = ['wood', 'leaves', 'stone'];
+    
+    for(let i = 0; i < blockTypes.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'inventory-slot' + (i === 0 ? ' selected' : '');
+        slot.setAttribute('data-type', blockTypes[i]);
+        inventory.appendChild(slot);
+    }
+    
+    document.body.appendChild(inventory);
+    document.querySelector('.inventory').style.display = 'block';
+}
+
+function updateInventorySelection() {
+    const slots = document.querySelectorAll('.inventory-slot');
+    slots.forEach(slot => slot.classList.remove('selected'));
+    slots[selectedBlock].classList.add('selected');
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    
+    time += 0.005;
+    sun.position.x = 50 * Math.cos(time);
+    sun.position.z = 50 * Math.sin(time);
+    
+    jumpVelocity -= GRAVITY;
+    camera.position.y += jumpVelocity;
+    
+    if(camera.position.y <= 2) {
+        camera.position.y = 2;
+        jumpVelocity = 0;
+        canJump = true;
+    } else if(camera.position.y >= 100) {
+        camera.position.y = 100;
+        jumpVelocity = 0;
+    }
+    
+    const distanceToSun = camera.position.distanceTo(sun.position);
+    if(distanceToSun < 30) {
+        const scale = 5 + (30 - distanceToSun) / 2;
+        sun.scale.set(scale, scale, scale);
+        
+        if(distanceToSun < 15) {
+            showCredits();
+        }
+    } else {
+        sun.scale.set(1, 1, 1);
+    }
+    
+    if(moveForward) velocity.z = -0.1;
+    else if(moveBackward) velocity.z = 0.1;
+    else velocity.z = 0;
+    
+    if(moveLeft) velocity.x = -0.1;
+    else if(moveRight) velocity.x = 0.1;
+    else velocity.x = 0;
+    
+    direction.z = Number(moveForward) - Number(moveBackward);
+    direction.x = Number(moveRight) - Number(moveLeft);
+    direction.normalize();
+    
+    if(moveForward || moveBackward) {
+        camera.position.z += velocity.z * Math.cos(camera.rotation.y);
+        camera.position.x += velocity.z * Math.sin(camera.rotation.y);
+    }
+    
+    if(moveLeft || moveRight) {
+        camera.position.z += velocity.x * Math.cos(camera.rotation.y + Math.PI/2);
+        camera.position.x += velocity.x * Math.sin(camera.rotation.y + Math.PI/2);
+    }
+    
+    renderer.render(scene, camera);
+}
+
+function startGame() {
+    document.querySelector('.menu').style.display = 'none';
+    document.querySelector('.game-container').style.display = 'block';
+    if (!isGameStarted) {
+        initGame();
+        isGameStarted = true;
+    }
+}
+
+function showOptions() {
+    alert("Options menu not coming soon!");
+}
+
+function quitGame() {
+    alert("No.");
+}
+
+function showCredits() {
+    const creditsContainer = document.createElement('div');
+    creditsContainer.className = 'credits-container';
+    
+    const credits = document.createElement('div');
+    credits.className = 'credits';
+    
+    credits.innerHTML = `
+        <h2>Minecraft 3.0: The</h2>
+        
+        <p class="role">Professional Sun Touchers</p>
+        <p>You (MOM IM IN THE CREDITS)</p>
+        <p>Icarus Jr.</p>
+        <p>The Human Torch's Biggest Fan</p>
+        
+        <p class="role">Department of Gravity Defiance</p>
+        <p>Sir Float-a-lot</p>
+        <p>The Weightless Wonder</p>
+        <p>Captain Anti-Newton</p>
+        
+        <p class="role">Masters of Cubic Arts</p>
+        <p>Bob the Block Builder</p>
+        <p>Square McPixel</p>
+        <p>The Geometry Whisperer</p>
+        
+        <p class="role">Sky Navigation Officers</p>
+        <p>Captain Space Cadet</p>
+        <p>Major Tom's Cousin Tim</p>
+        <p>Lieutenant Lost-in-Space</p>
+        
+        <p class="role">Solar Relations Department</p>
+        <p>The Sunburn King</p>
+        <p>Miss Solar Flare</p>
+        <p>Dr. Vitamin D++++</p>
+        
+        <p class="role">Unrealistic Physics Team</p>
+        <p>Peter Pan's Stunt Double</p>
+        <p>Mary Poppins' Umbrella Consultant</p>
+        <p>The Anti-Gravity Anarchist</p>
+        
+        <p class="role">Department of Bad Ideas</p>
+        <p>Prof. Y. Not</p>
+        <p>The guy that thought adding wierd names was a good idea</p>
+        <p>The "Hold My Beer" Expert</p>
+        
+        <p class="role">Solar Shenanigans Committee</p>
+        <p>Ray O. Sunshine</p>
+        <p>The Daylight Daredevil</p>
+        <p>Ultra Violet the Fearless</p>
+        
+        <p class="role">Celestial Body Safety Ignorers</p>
+        <p>Captain OSHA Violation</p>
+        <p>The Space Insurance Nightmare</p>
+        <p>Risk Assessment Dropout</p>
+
+        <p class="role">Department of "It Seemed Like a Good Idea"</p>
+        <p>The Consequences Avoider</p>
+        <p>Tomorrow's Problem Manager</p>
+        <p>The "Watch This!" Specialist</p>
+
+        <h2>Special Thanks</h2>
+        <p>To Newton, for looking the other way</p>
+        <p>To Einstein, for not understanding the relativity of this game</p>
+        <p>To NASA, for not filing a complaint</p>
+        <p>To the Sun, for being such a good sport about being touched</p>
+        <p>To logic, for.. well...</p>
+        <p>To physics, for being more of a suggestion than a rule</p>
+        <p>To common sense, for not being so common after all</p>
+        
+        <h2>Extra Special Thanks</h2>
+        <p>To anyone who thought touching the sun was a good idea</p>
+        <p>To the programmer who thought sun-touching was a valid game mechanic</p>
+        <p>To the QA team who somehow approved this</p>
+        <p>To the player who's actually reading these credits</p>
+        <p>To the laws of thermodynamics, which we completely ignored</p>
+        
+        <h2>Even More Special Thanks</h2>
+        <p>To the marketing team who sold this as a "feature"</p>
+        <p>To the legal team who approved "sun touching" as safe</p>
+        <p>To the insurance company who hasn't read the game design document</p>
+        
+        <h2>Extremely Special Thanks</h2>
+        <p>To whoever's still scrolling at this point</p>
+        <p>To the cosmic forces tolerating this nonsense</p>
+        <p>To the space-time continuum for its flexibility</p>
+        
+        <h2>Achievement Department</h2>
+        <p>"Touch The Untouchable"</p>
+        <p>"Solar System Safety Violation"</p>
+        <p>"Why Did You Think This Was A Good Idea?"</p>
+        <p>"Congratulations, You're Basically Plasma Now!"</p>
+        <p>"Sun's Biggest Fan... Literally"</p>
+        
+        <h2>Final Thoughts</h2>
+        <p>If you're reading this, you've probably spent too much time</p>
+        <p>touching a star that's millions of degrees hot</p>
+        <p>Maybe go touch some grass instead?</p>
+        <p>(Assuming you haven't vaporized it all)</p>
+        
+        <p class="role">Now enjoy the video we prepared for you!</p>
+    `;
+    
+    creditsContainer.appendChild(credits);
+    document.body.appendChild(creditsContainer);
+    
+    creditsContainer.style.display = 'block';
+    
+    creditsContainer.addEventListener('click', () => {
+        location.reload();
+    });
+    
+    credits.addEventListener('animationend', () => {
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    });
+}
+
+</script>
+</head>
+<body>
+    <div class="menu">
+        <h1 class="logo">Minecraft 3.0: The</h1>
+        <div class="minecraft-btn" onclick="startGame()">Play Game</div>
+        <div class="minecraft-btn" onclick="showOptions()">Options</div>
+        <div class="minecraft-btn" onclick="quitGame()">Quit Game</div>
+        
+        <div class="controls-list">
+            <h2>Controls</h2>
+            <ul>
+                <li>WASD - Move around</li>
+                <li>Mouse - Look around</li>
+                <li>Left Click - Break blocks</li>
+                <li>Right Click - Place blocks</li>
+                <li>1,2,3 - Select inventory slot</li>
+                <li>Spacebar - Jump</li>
+                <li>Click to start - Enables mouse control</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+    <div class="crosshair">+</div>
+</body></html>
