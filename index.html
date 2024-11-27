@@ -1,5 +1,5 @@
 <html><head><base href="." />
-<title>Minecraft 3.1 or something</title>
+<title>Minecraft 3.1: Not minecraft 3.0 lol</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { 
@@ -254,6 +254,10 @@ function handleOutOfBounds() {
     overlay.style.backgroundColor = 'white';
     overlay.style.zIndex = '9999';
     document.body.appendChild(overlay);
+
+    // Play both beep and cat laugh sounds
+    const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodHQnVstPo/Y8OCNUDZQoN3s8cB+SC9JuPb/0pA7AAAAAP//');
+    beep.play();
     
     // Only play laugh if it hasn't been played before
     if (!hasPlayedLaugh) {
@@ -798,7 +802,7 @@ function startGame() {
 }
 
 function showOptions() {
-    alert("Options menu not coming soon!");
+    alert("Options menu coming soon!");
 }
 
 function quitGame() {
@@ -904,7 +908,8 @@ function showCredits() {
         <p>Maybe go touch some grass instead?</p>
         <p>(Assuming you haven't vaporized it all)</p>
         
-        <p class="role">Now enjoy the video we prepared for you!</p>
+        <p class="role">Click anywhere to return to reality</p>
+        <p>(If you still have fingers to click with)</p>
     `;
     
     creditsContainer.appendChild(credits);
@@ -940,7 +945,7 @@ function showCredits() {
                 <li>1,2,3 - Select inventory slot</li>
                 <li>Spacebar - Jump</li>
                 <li>Click to start - Enables mouse control</li>
-                <li>X - Free VBucks</li>
+                <li>V - Find out yourself</li>
             </ul>
         </div>
     </div>
