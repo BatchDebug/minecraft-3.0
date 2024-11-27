@@ -1,5 +1,5 @@
 <html><head><base href="." />
-<title>Minecraft 3.0: The</title>
+<title>Minecraft 3.1 or something</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { 
@@ -68,24 +68,33 @@ body {
     margin: 5px;
     background: rgba(255, 255, 255, 0.1);
     position: relative;
-    background-size: cover;
+    background-size: contain !important;
     image-rendering: pixelated;
 }
 
 .inventory-slot[data-type="wood"] {
-    background-image: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_log.png');
+    background: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_log.png') center center no-repeat;
 }
 
 .inventory-slot[data-type="leaves"] {
-    background-image: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_leaves.png');
+    background: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_leaves.png') center center no-repeat;
 }
 
 .inventory-slot[data-type="stone"] {
-    background-image: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/stone.png');
+    background: url('https://raw.githubusercontent.com/minecraft/textures/main/blocks/stone.png') center center no-repeat;
 }
 
 .selected {
     background: rgba(255, 255, 255, 0.3);
+}
+
+.count {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    color: white;
+    text-shadow: 1px 1px 1px #000;
+    font-size: 14px;
 }
 
 .crosshair {
@@ -205,17 +214,75 @@ body {
 }
 </style>
 
-<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F21%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
-<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F20%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
-<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F19%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
-<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F17%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
-<script type="text/javascript" nonce="addc2cecd86f4233939192a081c" src="//local.adguard.org?ts=1732539651146&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="text/javascript" nonce="572724c9364f4be481bdc4d3ad4" src="//local.adguard.org?ts=1732733215273&amp;type=content-script&amp;dmn=party.websim.ai&amp;url=https%3A%2F%2Fparty.websim.ai%2Fapi%2Fv1%2Fprojects%2F35zfdne45sywc227j83i%2Frevisions%2F63%2Fhtml&amp;app=zen.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script>
+<script type="text/javascript" nonce="572724c9364f4be481bdc4d3ad4" src="//local.adguard.org?ts=1732733215273&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+const CAT_LAUGH_URL = 'https://www.myinstants.com/media/sounds/cat-laugh-meme-1.mp3';
+let hasPlayedLaugh = false;
+let gameOverTimer = null;
+
 const blockTextures = {
     wood: 'https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_log.png',
     leaves: 'https://raw.githubusercontent.com/minecraft/textures/main/blocks/oak_leaves.png',
     stone: 'https://raw.githubusercontent.com/minecraft/textures/main/blocks/stone.png'
 };
+
+const BOUNDS_LIMIT = 50; // Distance from center before triggering out of bounds
+let isOutOfBounds = false;
+
+function checkOutOfBounds() {
+    if(Math.abs(camera.position.x) > BOUNDS_LIMIT || Math.abs(camera.position.z) > BOUNDS_LIMIT) {
+        if(!isOutOfBounds) {
+            isOutOfBounds = true;
+            handleOutOfBounds();
+        }
+    }
+}
+
+function handleOutOfBounds() {
+    if (gameOverTimer) {
+        clearTimeout(gameOverTimer);
+    }
+    
+    // Create white overlay
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'white';
+    overlay.style.zIndex = '9999';
+    document.body.appendChild(overlay);
+
+    // Play both beep and cat laugh sounds
+    const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodHQnVstPo/Y8OCNUDZQoN3s8cB+SC9JuPb/0pA7AAAAAP//');
+    beep.play();
+    
+    // Only play laugh if it hasn't been played before
+    if (!hasPlayedLaugh) {
+        const laugh = new Audio(CAT_LAUGH_URL);
+        laugh.play();
+        hasPlayedLaugh = true;
+    }
+
+    // After 5 seconds, return to menu and start 20 second game over timer
+    setTimeout(() => {
+        document.body.removeChild(overlay);
+        document.querySelector('.menu').style.display = 'block';
+        document.querySelector('.game-container').style.display = 'none';
+        isOutOfBounds = false;
+        
+        // Start 20 second game over timer
+        if (gameOverTimer) {
+            clearTimeout(gameOverTimer);
+        }
+        gameOverTimer = setTimeout(() => {
+            alert('Game Over!');
+            location.reload();
+        }, 20000); // 20 seconds
+    }, 5000);
+}
 
 let scene, camera, renderer, world;
 let sun;
@@ -274,7 +341,7 @@ function initGame() {
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
-    
+
     for(let i = 0; i < 20; i++) {
         const x = Math.random() * 80 - 40;
         const z = Math.random() * 80 - 40;
@@ -499,11 +566,6 @@ function updateInventoryDisplay() {
         const countDisplay = slots[index].querySelector('.count');
         if(countDisplay) {
             countDisplay.textContent = count;
-        } else {
-            const countElement = document.createElement('div');
-            countElement.className = 'count';
-            countElement.textContent = count;
-            slots[index].appendChild(countElement);
         }
     });
 }
@@ -631,6 +693,13 @@ function setupInventory() {
         const slot = document.createElement('div');
         slot.className = 'inventory-slot' + (i === 0 ? ' selected' : '');
         slot.setAttribute('data-type', blockTypes[i]);
+        
+        // Add count display
+        const count = document.createElement('div');
+        count.className = 'count';
+        count.textContent = '0';
+        slot.appendChild(count);
+        
         inventory.appendChild(slot);
     }
     
@@ -642,6 +711,26 @@ function updateInventorySelection() {
     const slots = document.querySelectorAll('.inventory-slot');
     slots.forEach(slot => slot.classList.remove('selected'));
     slots[selectedBlock].classList.add('selected');
+}
+
+function checkBlockCollisions() {
+    const playerBoundingBox = new THREE.Box3();
+    const playerSize = new THREE.Vector3(1, 2, 1);
+    playerBoundingBox.setFromCenterAndSize(camera.position, playerSize);
+
+    blocks.forEach(block => {
+        const blockBox = new THREE.Box3();
+        blockBox.setFromObject(block);
+
+        if(playerBoundingBox.intersectsBox(blockBox)) {
+            // Push player away from block
+            const pushDirection = new THREE.Vector3()
+                .copy(camera.position)
+                .sub(block.position)
+                .normalize();
+            camera.position.add(pushDirection.multiplyScalar(0.1));
+        }
+    });
 }
 
 function animate() {
@@ -697,6 +786,9 @@ function animate() {
         camera.position.x += velocity.x * Math.sin(camera.rotation.y + Math.PI/2);
     }
     
+    checkBlockCollisions();
+    checkOutOfBounds();
+    
     renderer.render(scene, camera);
 }
 
@@ -710,7 +802,7 @@ function startGame() {
 }
 
 function showOptions() {
-    alert("Options menu not coming soon!");
+    alert("Options menu coming soon!");
 }
 
 function quitGame() {
@@ -725,10 +817,10 @@ function showCredits() {
     credits.className = 'credits';
     
     credits.innerHTML = `
-        <h2>Minecraft 3.0: The</h2>
+        <h2>Minecraft 3.1: Lorem Ipsum</h2>
         
         <p class="role">Professional Sun Touchers</p>
-        <p>You (MOM IM IN THE CREDITS)</p>
+        <p>You, The Brave Soul</p>
         <p>Icarus Jr.</p>
         <p>The Human Torch's Biggest Fan</p>
         
@@ -759,7 +851,7 @@ function showCredits() {
         
         <p class="role">Department of Bad Ideas</p>
         <p>Prof. Y. Not</p>
-        <p>The guy that thought adding wierd names was a good idea</p>
+        <p>Dr. What Could Go Wrong</p>
         <p>The "Hold My Beer" Expert</p>
         
         <p class="role">Solar Shenanigans Committee</p>
@@ -782,7 +874,7 @@ function showCredits() {
         <p>To Einstein, for not understanding the relativity of this game</p>
         <p>To NASA, for not filing a complaint</p>
         <p>To the Sun, for being such a good sport about being touched</p>
-        <p>To logic, for.. well...</p>
+        <p>To logic, for taking an extended vacation</p>
         <p>To physics, for being more of a suggestion than a rule</p>
         <p>To common sense, for not being so common after all</p>
         
@@ -837,7 +929,7 @@ function showCredits() {
 </head>
 <body>
     <div class="menu">
-        <h1 class="logo">Minecraft 3.0: The</h1>
+        <h1 class="logo">Minecraft 3.1: Lorem Ipsum</h1>
         <div class="minecraft-btn" onclick="startGame()">Play Game</div>
         <div class="minecraft-btn" onclick="showOptions()">Options</div>
         <div class="minecraft-btn" onclick="quitGame()">Quit Game</div>
@@ -852,6 +944,7 @@ function showCredits() {
                 <li>1,2,3 - Select inventory slot</li>
                 <li>Spacebar - Jump</li>
                 <li>Click to start - Enables mouse control</li>
+                <li>X - Free VBucks</li>
             </ul>
         </div>
     </div>
