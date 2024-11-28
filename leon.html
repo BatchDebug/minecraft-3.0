@@ -1,0 +1,641 @@
+<html><head><base href="." />
+<title>Minecraft 4.0 (The Edition) - Epic Fish Battle</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Minecraft', Arial, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+}
+
+#mainMenu, #gameScreen, #gameOverScreen, #winScreen {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#mainMenu {
+    background: linear-gradient(45deg, #1e5799, #2989d8, #207cca, #7db9e8);
+    animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+    z-index: 1000;
+}
+
+.minecraft-btn {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 24px;
+    background: #4CAF50;
+    border: 3px solid #2e6830;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    text-shadow: 2px 2px #000;
+    position: relative;
+    overflow: hidden;
+}
+
+#weaponCooldown {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 24px;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    z-index: 100;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes wobble {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(5deg) scale(1.05); }
+    75% { transform: rotate(-5deg) scale(0.95); }
+}
+
+#healthBar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 300px;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid #fff;
+    z-index: 100;
+}
+
+#health {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000, #ff6b6b);
+    transition: width 0.3s;
+}
+
+#bossHealthBar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 400px;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid #fff;
+    z-index: 100;
+}
+
+#bossHealth {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #9c27b0, #e91e63);
+    transition: width 0.3s;
+}
+
+#crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.screen {
+    display: none;
+    background: rgba(0, 0, 0, 0.9);
+    text-align: center;
+}
+
+#winScreen h1 {
+    color: #4CAF50;
+}
+</style>
+</head>
+<body>
+<div id="mainMenu">
+    <h1 class="title">Minecraft 4.0<br>(The Edition) (LeonTougeTV Edition)</h1>
+    <h2 class="subtitle">Epic Battle Against<br>The Fish of Fish of a Fish that Fish</h2>
+    <button class="minecraft-btn" onclick="startGame()">Start Game</button>
+    <p class="subtitle" style="font-size: 18px">Use WASD to move, MOUSE to aim, CLICK to shoot<br>SPACE to jump, SHIFT to dash</p>
+</div>
+
+<div id="gameScreen">
+    <div id="healthBar"><div id="health"></div></div>
+    <div id="bossHealthBar"><div id="bossHealth"></div></div>
+    <div id="weaponCooldown">Ready!</div>
+    <div id="crosshair">
+        <svg width="20" height="20">
+            <circle cx="10" cy="10" r="8" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="10" cy="10" r="2" fill="white"/>
+        </svg>
+    </div>
+</div>
+
+<div id="gameOverScreen" class="screen">
+    <h1 class="title">GAME OVER</h1>
+    <h2 class="subtitle">The Fish was too Powerful!</h2>
+    <button class="minecraft-btn" onclick="restartGame()">Try Again</button>
+</div>
+
+<div id="winScreen" class="screen">
+    <h1 class="title">VICTORY!</h1>
+    <h2 class="subtitle">You have defeated the mighty Fish!</h2>
+    <button class="minecraft-btn" onclick="restartGame()">Play Again</button>
+</div>
+
+<script>
+const SPEED_INTERVAL = 15000; // Super speed activates every 15 seconds
+const NORMAL_BOSS_SPEED = 0.05;
+const SUPER_BOSS_SPEED = 0.3;
+
+let playerHealth = 100;
+let bossHealth = 100;
+let gameActive = false;
+let scene, camera, renderer, boss, player;
+let bullets = [];
+let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+let canShoot = true;
+let shootCooldown = 5000; // 5 seconds
+let shootSound, deathSound;
+let bossMoveSound; // New variable for boss speed sound
+
+let isJumping = false;
+let canDash = true;
+let dashCooldown = 6000; // 6 seconds
+let playerVelocityY = 0;
+const GRAVITY = 0.015;
+const JUMP_FORCE = 0.3;
+const DASH_FORCE = 1.0;
+
+const JUMP_INTERVAL = 8000; // Boss jumps every 8 seconds
+const SPIN_INTERVAL = 12000; // Boss spins every 12 seconds
+let bossState = 'normal'; // Add boss state tracking
+let bossAbilityIntervals = []; // Track boss ability intervals
+
+function initSounds() {
+    shootSound = new Audio('https://www.myinstants.com/media/sounds/pump-shotgun-fortnite-loud.mp3');
+    deathSound = new Audio('https://www.myinstants.com/media/sounds/cat-laugh-meme-1.mp3');
+    bossMoveSound = new Audio('https://sndup.net/zmyb6/d');
+    bossMoveSound.loop = true; // Make the sound loop continuously
+}
+
+function createArena() {
+    // Create battle platform
+    const platformGeometry = new THREE.BoxGeometry(40, 1, 40);
+    const platformMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
+    const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+    platform.position.y = -2;
+    scene.add(platform);
+
+    // Create invisible walls
+    const wallGeometry = new THREE.BoxGeometry(40, 20, 1);
+    const wallMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x0066ff,
+        transparent: true,
+        opacity: 0.2
+    });
+
+    // Front wall
+    const frontWall = new THREE.Mesh(wallGeometry, wallMaterial);
+    frontWall.position.set(0, 8, -20);
+    scene.add(frontWall);
+
+    // Back wall
+    const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
+    backWall.position.set(0, 8, 20);
+    scene.add(backWall);
+
+    // Side walls
+    const sideWallGeometry = new THREE.BoxGeometry(1, 20, 40);
+    const leftWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
+    leftWall.position.set(-20, 8, 0);
+    scene.add(leftWall);
+
+    const rightWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
+    rightWall.position.set(20, 8, 0);
+    scene.add(rightWall);
+}
+
+function createSkybox() {
+    const loader = new THREE.CubeTextureLoader();
+    scene.background = new THREE.Color(0x87CEEB); // Light blue sky color
+
+    // Add directional light for better visibility
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(0, 10, 0);
+    scene.add(directionalLight);
+}
+
+function createBossTexture() {
+    const textureLoader = new THREE.TextureLoader();
+    const fishTexture = textureLoader.load('https://c.tenor.com/R5IECfIf34YAAAAd/tenor.gif');
+    return new THREE.MeshBasicMaterial({ map: fishTexture });
+}
+
+function initBossAbilities() {
+    // Schedule jump attacks
+    const jumpInterval = setInterval(() => {
+        if (gameActive && bossState === 'normal') {
+            bossJumpAttack();
+        }
+    }, JUMP_INTERVAL);
+    bossAbilityIntervals.push(jumpInterval);
+
+    // Schedule spin attacks
+    const spinInterval = setInterval(() => {
+        if (gameActive && bossState === 'normal') {
+            bossSpinAttack();
+        }
+    }, SPIN_INTERVAL);
+    bossAbilityIntervals.push(spinInterval);
+
+    // Add speed attack interval
+    const speedInterval = setInterval(() => {
+        if (gameActive && bossState === 'normal') {
+            bossSpeedAttack();
+        }
+    }, SPEED_INTERVAL);
+    bossAbilityIntervals.push(speedInterval);
+}
+
+function bossJumpAttack() {
+    bossState = 'jumping';
+    const originalY = boss.position.y;
+    const jumpHeight = 10;
+    
+    // Jump up
+    const jumpUp = new TWEEN.Tween(boss.position)
+        .to({ y: originalY + jumpHeight }, 1000)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onComplete(() => {
+            // Jump down
+            new TWEEN.Tween(boss.position)
+                .to({ y: originalY }, 500)
+                .easing(TWEEN.Easing.Quadratic.In)
+                .onComplete(() => {
+                    bossState = 'normal';
+                    // Create shockwave effect that damages player if nearby   
+                    if (boss.position.distanceTo(camera.position) < 10) {
+                        playerHealth -= 15;
+                        updateHealth();
+                        if (playerHealth <= 0) {
+                            endGame(false);
+                        }
+                    }
+                })
+                .start();
+        })
+        .start();
+}
+
+function bossSpinAttack() {
+    bossState = 'spinning';
+    let rotations = 0;
+    const spinInterval = setInterval(() => {
+        if (rotations >= 10 || !gameActive) {
+            clearInterval(spinInterval);
+            bossState = 'normal';
+            return;
+        }
+        boss.rotation.z += Math.PI / 4;
+        rotations++;
+        
+        // Damage player if too close during spin
+        if (boss.position.distanceTo(camera.position) < 8) {
+            playerHealth -= 3;
+            updateHealth();
+            if (playerHealth <= 0) {
+                endGame(false);
+            }
+        }
+    }, 100);
+}
+
+function bossSpeedAttack() {
+    if (bossState !== 'normal') return;
+    
+    bossState = 'speeding';
+    
+    // Activate super speed
+    const speedDuration = 1500; // 1.5 seconds
+    bossMoveSound.play(); // Start playing the movement sound during speed
+    setTimeout(() => {
+        if (gameActive) {
+            bossState = 'normal';
+            bossMoveSound.pause(); // Stop the sound after speed ends
+        }
+    }, speedDuration);
+}
+
+function init3D() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('gameScreen').appendChild(renderer.domElement);
+
+    createSkybox();
+    createArena();
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    
+    const bossGeometry = new THREE.BoxGeometry(2, 2, 2);
+    const bossMaterial = createBossTexture();
+    boss = new THREE.Mesh(bossGeometry, bossMaterial);
+    boss.position.set(0, 2, -10);
+    scene.add(boss);
+
+    camera.position.z = 5;
+    camera.position.y = 2;
+    
+    // Initialize boss abilities
+    initBossAbilities();
+}
+
+function handleJump() {
+    if (!isJumping) {
+        isJumping = true;
+        playerVelocityY = JUMP_FORCE;
+    }
+}
+
+function handleDash() {
+    if (!canDash) return;
+    
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+    
+    // Apply dash force in looking direction
+    camera.position.add(direction.multiplyScalar(DASH_FORCE));
+    
+    // Start cooldown
+    canDash = false;
+    setTimeout(() => {
+        canDash = true;
+    }, dashCooldown);
+}
+
+function updateCooldownDisplay() {
+    const cooldownDisplay = document.getElementById('weaponCooldown');
+    if (!canShoot) {
+        cooldownDisplay.textContent = 'Reloading...';
+    } else {
+        cooldownDisplay.textContent = 'Ready!';
+    }
+}
+
+function updatePlayerPosition() {
+    const newPosition = camera.position.clone();
+    
+    if (moveForward) newPosition.z -= 0.1;
+    if (moveBackward) newPosition.z += 0.1;
+    if (moveLeft) newPosition.x -= 0.1;
+    if (moveRight) newPosition.x += 0.1;
+    
+    // Apply gravity and vertical movement
+    playerVelocityY -= GRAVITY;
+    newPosition.y += playerVelocityY;
+    
+    // Ground collision check
+    if (newPosition.y <= 2) { // 2 is player height
+        newPosition.y = 2;
+        playerVelocityY = 0;
+        isJumping = false;
+    }
+    
+    // Check boundaries
+    newPosition.x = Math.max(-19, Math.min(19, newPosition.x));
+    newPosition.z = Math.max(-19, Math.min(19, newPosition.z));
+    
+    camera.position.copy(newPosition);
+}
+
+function restartGame() {
+    bossMoveSound.pause(); // Stop sound when restarting
+    // Clear boss ability intervals
+    bossAbilityIntervals.forEach(interval => clearInterval(interval));
+    bossAbilityIntervals = [];
+    
+    if (scene) {
+        while(scene.children.length > 0){ 
+            scene.remove(scene.children[0]); 
+        }
+        renderer.dispose();
+        document.getElementById('gameScreen').removeChild(renderer.domElement);
+    }
+    bullets = [];
+    bossState = 'normal'; // Reset boss state
+    startGame();
+}
+
+function shoot() {
+    if (!gameActive || !canShoot || !document.pointerLockElement) return;
+    
+    shootSound.currentTime = 0;
+    shootSound.play();
+    
+    const bulletGeometry = new THREE.SphereGeometry(0.1);
+    const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+    
+    bullet.position.set(camera.position.x, camera.position.y, camera.position.z);
+    bullet.velocity = new THREE.Vector3();
+    camera.getWorldDirection(bullet.velocity);
+    bullet.velocity.multiplyScalar(0.5);
+    
+    scene.add(bullet);
+    bullets.push(bullet);
+    
+    canShoot = false;
+    updateCooldownDisplay();
+    
+    setTimeout(() => {
+        canShoot = true;
+        updateCooldownDisplay();
+    }, shootCooldown);
+}
+
+function moveBossTowardsPlayer() {
+    const direction = new THREE.Vector3();
+    direction.subVectors(camera.position, boss.position);
+    direction.normalize();
+    
+    // Set speed based on state
+    let speed = NORMAL_BOSS_SPEED;
+    if (bossState === 'speeding') {
+        speed = SUPER_BOSS_SPEED;
+    }
+    
+    boss.position.add(direction.multiplyScalar(speed));
+    
+    // Update sound volume based on distance
+    const distance = boss.position.distanceTo(camera.position);
+    const maxDistance = 40; // Maximum distance for sound
+    const volume = Math.max(0, 1 - (distance / maxDistance));
+    bossMoveSound.volume = volume;
+}
+
+function animate() {
+    if (!gameActive) return;
+    requestAnimationFrame(animate);
+    
+    TWEEN.update();
+    
+    moveBossTowardsPlayer();
+    updatePlayerPosition();
+    
+    boss.rotation.y += 0.01;
+    if (bossState !== 'spinning') {
+        boss.lookAt(camera.position);
+    }
+    
+    // Update bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].position.add(bullets[i].velocity);
+        
+        if (bullets[i].position.distanceTo(boss.position) < 1.5) {
+            bossHealth -= 5;
+            updateBossHealth();
+            scene.remove(bullets[i]);
+            bullets.splice(i, 1);
+            
+            if (bossHealth <= 0) {
+                endGame(true);
+            }
+            continue;
+        }
+        
+        if (bullets[i].position.length() > 100) {
+            scene.remove(bullets[i]);
+            bullets.splice(i, 1);
+        }
+    }
+    
+    renderer.render(scene, camera);
+}
+
+function startGame() {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'block';
+    document.getElementById('gameOverScreen').style.display = 'none';
+    document.getElementById('winScreen').style.display = 'none';
+    
+    gameActive = true;
+    playerHealth = 100;
+    bossHealth = 100;
+    updateHealth();
+    initSounds(); // Initialize sounds
+    bossMoveSound.play(); // Start playing the movement sound
+    init3D();
+    animate();
+    startBossAttack();
+    
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('click', shoot);
+    document.body.requestPointerLock();
+    
+    document.addEventListener('click', () => {
+        if (document.pointerLockElement === null) {
+            document.body.requestPointerLock();
+        }
+    });
+}
+
+function updateHealth() {
+    document.getElementById('health').style.width = playerHealth + '%';
+    document.getElementById('bossHealth').style.width = bossHealth + '%';
+}
+
+function updateBossHealth() {
+    document.getElementById('bossHealth').style.width = bossHealth + '%';
+}
+
+function startBossAttack() {
+    setInterval(() => {
+        if (!gameActive) return;
+        if (boss.position.distanceTo(camera.position) < 7) {
+            playerHealth -= 5;
+            updateHealth();
+            
+            if (playerHealth <= 0) {
+                endGame(false);
+            }
+        }
+    }, 1000);
+}
+
+function endGame(won) {
+    gameActive = false;
+    bossMoveSound.pause(); // Stop the movement sound
+    document.exitPointerLock();
+    
+    if (won) {
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'flex';
+    } else {
+        deathSound.play();
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('gameOverScreen').style.display = 'flex';
+    }
+}
+
+function onKeyDown(event) {
+    switch (event.code) {
+        case 'KeyW': moveForward = true; break;
+        case 'KeyS': moveBackward = true; break;
+        case 'KeyA': moveLeft = true; break;
+        case 'KeyD': moveRight = true; break;
+        case 'Space': handleJump(); break;
+        case 'ShiftLeft': handleDash(); break;
+    }
+}
+
+function onKeyUp(event) {
+    switch (event.code) {
+        case 'KeyW': moveForward = false; break;
+        case 'KeyS': moveBackward = false; break;
+        case 'KeyA': moveLeft = false; break;
+        case 'KeyD': moveRight = false; break;
+    }
+}
+
+function onMouseMove(event) {
+    if (gameActive && document.pointerLockElement) {
+        camera.rotation.y -= event.movementX * 0.002;
+        camera.rotation.x -= event.movementY * 0.002;
+        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+    }
+}
+
+window.addEventListener('resize', () => {
+    if (camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+});
+
+document.addEventListener('pointerlockchange', () => {
+    if (document.pointerLockElement === null && gameActive) {
+        // If game is active but pointer lock is lost, request it again
+        document.body.requestPointerLock();
+    }
+});
+</script>
+</body></html>
